@@ -1,9 +1,12 @@
 package com.example.quseit.lazylib.widget;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -13,8 +16,12 @@ import android.widget.Toast;
 
 import com.example.quseit.lazylib.R;
 
+import org.xutils.x;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by PC_QUSEIT on 2016/4/29.
@@ -59,6 +66,35 @@ public class HeadBannerView extends RelativeLayout {
         this.addView(view);
     }
 
+    Timer timer = new Timer();
+    MyTimerTask timerTask;
+    class MyTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            // 需要做的事:发送消息
+            Message message = new Message();
+            message.what = 1;
+            handler.sendMessage(message);
+        }
+    }
+
+    Handler handler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            viewpager.setCurrentItem(currentItem + 1, true);
+        }
+    };
+
+    public void StartLockWindowTimer(){
+        if (timer != null){
+            if (timerTask != null){
+                timerTask.cancel();  //将原任务从队列中移除
+            }
+            timerTask = new MyTimerTask();  // 新建一个任务
+            timer.schedule(timerTask, 6000, 3000); // 3s后执行task,经过3s再次执行
+        }
+    }
+
     /**
      *  初始化 点
      * @param images
@@ -92,6 +128,7 @@ public class HeadBannerView extends RelativeLayout {
         for(int i = 0; i < count; i++){
             ImageView imageView = new ImageView(context);
             imageView.setImageResource(R.drawable.find);
+            x.image().bind(imageView,entity.get(i).getImgUrl());
             images.add(imageView);
         }
 
@@ -117,11 +154,13 @@ public class HeadBannerView extends RelativeLayout {
                     }
                 }
             }
+
             @Override
             public void onPageScrollStateChanged(int state) {
 
             }
         });
+        //StartLockWindowTimer();
     }
 
 

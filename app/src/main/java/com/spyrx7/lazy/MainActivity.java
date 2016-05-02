@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         headBannerView = (HeadBannerView)findViewById(R.id.header_container);
         headBannerView.initView(bannerModels);
+        headBannerView.StartLockWindowTimer();
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
