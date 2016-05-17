@@ -40,6 +40,17 @@ public class HeadBannerView extends RelativeLayout {
     private int currentItem = 0;
     int pageindex = 0;
 
+    private OnUrlOnClick listener;
+    public interface OnUrlOnClick{
+        void onUrlOnClick(String url);
+    }
+
+    public void setOnUrlOnClick(OnUrlOnClick callback){
+        this.listener = callback;
+    }
+
+
+
     public HeadBannerView(Context context) {
         super(context);
         this.context = context;
@@ -128,13 +139,17 @@ public class HeadBannerView extends RelativeLayout {
         for(int i = 0; i < count; i++){
             ImageView imageView = new ImageView(context);
             imageView.setImageResource(R.drawable.find);
-            x.image().bind(imageView,entity.get(i).getImgUrl());
+            x.image().bind(imageView, entity.get(i).getImgUrl());
             images.add(imageView);
+            urls.add(entity.get(i).getUrl());
         }
+
+
 
         currentItem = Integer.MAX_VALUE / 2 - (Integer.MAX_VALUE / 2 % images.size());
         initImagerView(images);
         adapter = new SellViewPagerAdapter(context, viewpager, images, urls);
+        adapter.setUrl(urls);
         viewpager.setAdapter(adapter);
         viewpager.setCurrentItem(Integer.MAX_VALUE / 2 - (Integer.MAX_VALUE / 2 % images.size()));
         viewpager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
@@ -163,8 +178,6 @@ public class HeadBannerView extends RelativeLayout {
         //StartLockWindowTimer();
     }
 
-
-
     class  SellViewPagerAdapter extends PagerAdapter {
         private Context context;
         private List<ImageView> images;
@@ -178,6 +191,7 @@ public class HeadBannerView extends RelativeLayout {
             this.images = images;
             this.urls = urls;
             this.viewPager = viewPager;
+            Log.e("TAG",images.size()+"");
             // timer.schedule(task, 2000, 1000); // 1s后执行task,经过1s再次执行
         }
 
@@ -205,12 +219,13 @@ public class HeadBannerView extends RelativeLayout {
             images.get(position % images.size()).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (urls.size() > 0) {
-                        Toast.makeText(context, urls.get(position % images.size()), Toast.LENGTH_LONG).show();
+                    if (images.size() > 0) {
+                        if (listener != null) {
+                            listener.onUrlOnClick(urls.get(position % images.size())+"");
+                        }
                     }
                 }
             });
-
             return images.get(position % images.size());
         }
 
