@@ -7,6 +7,7 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -54,19 +55,19 @@ public class HeadBannerView extends RelativeLayout {
     public HeadBannerView(Context context) {
         super(context);
         this.context = context;
-        init();
+
     }
 
     public HeadBannerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         this.context = context;
-        init();
+
     }
 
     public HeadBannerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
-        init();
+
     }
 
     private void init(){
@@ -110,7 +111,7 @@ public class HeadBannerView extends RelativeLayout {
      *  初始化 点
      * @param images
      */
-    private void initImagerView(List<ImageView> images){
+    private void initImagerView(List<String> images){
         if (images == null) return;
         if(dianGroup == null){
             LinearLayout lgroup = (LinearLayout)view.findViewById(R.id.diangroup);
@@ -136,19 +137,19 @@ public class HeadBannerView extends RelativeLayout {
         if(entity == null) return;
         int count = entity.size();
 
+        init();
+
         for(int i = 0; i < count; i++){
             ImageView imageView = new ImageView(context);
-            imageView.setImageResource(R.drawable.find);
-            x.image().bind(imageView, entity.get(i).getImgUrl());
-            images.add(imageView);
             urls.add(entity.get(i).getUrl());
+            imgUrls.add(entity.get(i).getImgUrl());
+            images.add(imageView);
         }
 
 
-
         currentItem = Integer.MAX_VALUE / 2 - (Integer.MAX_VALUE / 2 % images.size());
-        initImagerView(images);
-        adapter = new SellViewPagerAdapter(context, viewpager, images, urls);
+        initImagerView(imgUrls);
+        adapter = new SellViewPagerAdapter(context, viewpager, imgUrls, urls);
         adapter.setUrl(urls);
         viewpager.setAdapter(adapter);
         viewpager.setCurrentItem(Integer.MAX_VALUE / 2 - (Integer.MAX_VALUE / 2 % images.size()));
@@ -180,15 +181,15 @@ public class HeadBannerView extends RelativeLayout {
 
     class  SellViewPagerAdapter extends PagerAdapter {
         private Context context;
-        private List<ImageView> images;
+        private List<String> imageurl;
         private List<String> urls;
         private ViewPager viewPager;
         private int currentItem = 0;
 
 
-        public SellViewPagerAdapter(Context context, ViewPager viewPager, List<ImageView> images, List<String> urls) {
+        public SellViewPagerAdapter(Context context, ViewPager viewPager, List<String> images, List<String> urls) {
             this.context = context;
-            this.images = images;
+            this.imageurl = images;
             this.urls = urls;
             this.viewPager = viewPager;
             Log.e("TAG",images.size()+"");
@@ -213,20 +214,21 @@ public class HeadBannerView extends RelativeLayout {
         @Override
         public Object instantiateItem(ViewGroup container, final int position) {
             currentItem = position;
-            ((ViewPager) container).addView(images.get(position % images.size()));
-            // ((ImageView) images.get(position)).setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, ViewGroup.LayoutParams.FILL_PARENT));
-            ((ImageView) images.get(position % images.size())).setScaleType(ImageView.ScaleType.CENTER_CROP);
-            images.get(position % images.size()).setOnClickListener(new View.OnClickListener() {
+            ImageView view_img = (ImageView) LayoutInflater.from(context).inflate(R.layout.view_image, container, false);
+            container.addView(view_img);
+            view_img.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            x.image().bind(view_img, imageurl.get(position % images.size()));
+            view_img.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     if (images.size() > 0) {
                         if (listener != null) {
-                            listener.onUrlOnClick(urls.get(position % images.size())+"");
+                            listener.onUrlOnClick(urls.get(position % images.size()) + "");
                         }
                     }
                 }
             });
-            return images.get(position % images.size());
+            return view_img;
         }
 
         @Override

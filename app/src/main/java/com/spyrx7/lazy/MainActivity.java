@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.quseit.lazylib.widget.BannerModel;
 import com.example.quseit.lazylib.widget.HeadBannerView;
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         headBannerView.setOnUrlOnClick(new HeadBannerView.OnUrlOnClick() {
             @Override
             public void onUrlOnClick(String url) {
-
+                Toast.makeText(MainActivity.this,url,Toast.LENGTH_LONG).show();
             }
         });
 
